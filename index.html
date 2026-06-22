@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Book: 100 HADIST BUKHARI MUSLIM</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-purple: #9b59b6;
+            --accent-red: #e74c3c;
+            --bg-light: #f0f2f5;
+            --sidebar-width: 320px;
+            --transition-speed: 0.3s;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: var(--bg-light); }
+
+        /* TOMBOL HAMBURGER (MOBILE ONLY) */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 100;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* SIDEBAR NAVIGASI (LEFT) */
+        #sidebar {
+            width: var(--sidebar-width);
+            background: var(--primary-color);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 90;
+            transition: transform var(--transition-speed) ease;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: #1a252f;
+            border-bottom: 1px solid #34495e;
+        }
+        .sidebar-header h2 { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; color: #ecf0f1; }
+        .sidebar-header p { font-size: 0.75rem; color: #bdc3c7; margin-top: 5px; }
+
+        .menu-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 0;
+        }
+
+        /* NESTED ACCORDION MENU SYSTEM */
+        .menu-section { 
+            margin-bottom: 5px; 
+        }
+        
+        /* Level 1: Bab Utama */
+        .menu-folder {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            color: #ecf0f1;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.02);
+            transition: background var(--transition-speed);
+            border-left: 4px solid transparent;
+        }
+        .menu-folder:hover {
+            background: #34495e;
+        }
+        .menu-folder::after {
+            content: '►';
+            font-size: 0.7rem;
+            transition: transform var(--transition-speed);
+            color: #7f8c8d;
+        }
+        .menu-section.open .menu-folder::after {
+            transform: rotate(90deg);
+        }
+        
+        /* Variasi warna indikator folder aktif */
+        .section-utama .menu-folder { border-left-color: #3498db; }
+        .section-bab1 .menu-folder { border-left-color: #1abc9c; }
+        .section-bab2 .menu-folder { border-left-color: var(--accent-purple); }
+        .section-bab3 .menu-folder { border-left-color: var(--accent-red); }
+        .section-penutup .menu-folder { border-left-color: #95a5a6; }
+
+        /* Level 2: Sub-Menu Konten */
+        .sub-menu {
+            max-height: 0;
+            overflow: hidden;
+            background: #1c2833;
+            transition: max-height var(--transition-speed) ease-out;
+        }
+        .menu-section.open .sub-menu {
+            max-height: 800px; /* Nilai aman agar ekspansi muat banyak item */
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 10px 20px 10px 35px;
+            color: #bdc3c7;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+        .menu-item:hover { 
+            background: #2c3e50; 
+            color: #fff;
+            padding-left: 40px; 
+        }
+        .menu-item.active {
+            background: #243342;
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        /* Warna highlight item sub-menu saat aktif */
+        .section-utama .menu-item.active { border-left-color: #3498db; }
+        .section-bab1 .menu-item.active { border-left-color: #1abc9c; }
+        .section-bab2 .menu-item.active { border-left-color: var(--accent-purple); }
+        .section-bab3 .menu-item.active { border-left-color: var(--accent-red); }
+        .section-penutup .menu-item.active { border-left-color: #95a5a6; }
+
+        /* KONTEN UTAMA / IFRAME */
+        #main-content {
+            flex: 1;
+            height: 100vh;
+            position: relative;
+            background: #fff;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* COVER VIEW */
+        .cover-page {
+            padding: 40px;
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, #fdfbf7 0%, #eee8dd 100%);
+        }
+        .cover-card {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            max-width: 650px;
+            border-top: 8px solid var(--primary-color);
+        }
+        .cover-tag { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: #7f8c8d; margin-bottom: 15px; font-weight: bold; }
+        .cover-title { font-size: 2.2rem; color: var(--primary-color); line-height: 1.3; margin-bottom: 20px; font-weight: 800; }
+        .cover-subtitle { font-size: 1.1rem; color: #555; margin-bottom: 35px; font-style: italic; }
+        .cover-divider { width: 80px; height: 3px; background: #3498db; margin: 20px auto; }
+        .cover-author { font-size: 1rem; font-weight: 600; color: #2c3e50; }
+        .cover-meta { font-size: 0.85rem; color: #95a5a6; margin-top: 5px; }
+        
+        .start-btn {
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .start-btn:hover { background: #1a252f; }
+
+        /* OVERLAY UNTUK MOBILE CLICK-AWAY */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 80;
+        }
+
+        /* RESPONSIVE LAYOUT (MEDIA QUERIES) */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            #sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+            }
+            #sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay.open {
+                display: block;
+            }
+            /* Memberi jarak atas pada cover agar tidak tertutup tombol hamburger */
+            .cover-page {
+                padding-top: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOMBOL MENU MOBILE -->
+    <button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
+    
+    <!-- OVERLAY MOBILE -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR NAVIGASI KIRI -->
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <h2>STUDI HADIST DIGITAL</h2>
+            <p>E-Book HADIST DIGITAL</p>
+        </div>
+
+        <div class="menu-container">
+            
+            <!-- MENU UTAMA (NESTED) -->
+            <div class="menu-section section-utama open">
+                <div class="menu-folder" onclick="toggleSection(this)">Menu Utama</div>
+                <div class="sub-menu">
+                    <div class="menu-item active" onclick="loadPage('cover', this)">Halaman Pertama (Cover)</div>
+                    <div class="menu-item" onclick="loadPage('sinopsis.html', this)">Sinopsis Buku</div>
+                </div>
+            </div>
+
+            <!-- BAB I (NESTED) -->
+            <div class="menu-section section-bab1">
+                <div class="menu-folder" onclick="toggleSection(this)">BAB I: Peperangan</div>
+                <div class="sub-menu">
+                    <div class="menu-item" onclick="loadPage('bab1_anmar.html', this)">Pertempuran Anmar</div>
+                    <div class="menu-item" onclick="loadPage('bab1_dzu_qarad.html', this)">Pertempuran Dzuq Qarad</div>
+                    <div class="menu-item" onclick="loadPage('bab1_hudaibiyah.html', this)">Pertempuran Hudaibiyah</div>
+                    <div class="menu-item" onclick="loadPage('bab1_kabar_dusta.html', this)">Kisah Kabar Dusta</div>
+                    <div class="menu-item" onclick="loadPage('bab1_khaibar.html', this)">Pertempuran Khaibar</div>
+                    <div class="menu-item" onclick="loadPage('bab1_khandaq.html', this)">Pertempuran Khandaq</div>
+                    <div class="menu-item" onclick="loadPage('bab1_quraidoh.html', this)">Penyerbuan Bani Quraidoh</div>
+                    <div class="menu-item" onclick="loadPage('bab1_ukl_ukrainah.html', this)">Kisah Ukl dan Urainah</div>
+                </div>
+            </div>
+
+            <!-- BAB II (NESTED) -->
+            <div class="menu-section section-bab2">
+                <div class="menu-folder" onclick="toggleSection(this)">BAB II: Etika Peperangan</div>
+                <div class="sub-menu">
+                    <div class="menu-item" onclick="loadPage('bab2_non_kombatan.html', this)">Larangan Membunuh Non-Kombatan</div>
+                    <div class="menu-item" onclick="loadPage('bab2_batas_khianat.html', this)">Larangan Melampaui Batas & Berkhianat</div>
+                    <div class="menu-item" onclick="loadPage('bab2_siksa_api.html', this)">Larangan Menyiksa dengan Api</div>
+                    <div class="menu-item" onclick="loadPage('bab2_merusak_lingkungan.html', this)">Larangan Merusak Lingkungan</div>
+                    <div class="menu-item" onclick="loadPage('bab2_memutilasi_mayat.html', this)">Dilarang Memutilasi Mayat</div>
+                    <div class="menu-item" onclick="loadPage('bab2_ahli_ibadah.html', this)">Larangan Membunuh Ahli Ibadah</div>
+                    <div class="menu-item" onclick="loadPage('bab2_tawanan_perang.html', this)">Keadilan terhadap Tawanan Perang</div>
+                    <div class="menu-item" onclick="loadPage('bab2_harta_rampasan.html', this)">Harta Rampasan Perang</div>
+                    <div class="menu-item" onclick="loadPage('bab2_menepati_perjanjian.html', this)">Menepati Perjanjian</div>
+                    <div class="menu-item" onclick="loadPage('bab2_konsekuensi_melanggar.html', this)">Konsekuensi Melanggar Etika</div>
+                    <div class="menu-item" onclick="loadPage('bab2_menanam_pohon.html', this)">Menanam Pohon Adalah Sedekah</div>
+                </div>
+            </div>
+
+            <!-- BAB III (NESTED) -->
+            <div class="menu-section section-bab3">
+                <div class="menu-folder" onclick="toggleSection(this)">BAB III: Akhir Zaman</div>
+                <div class="sub-menu">
+                    <div class="menu-item" onclick="loadPage('bab3_waktu_malhamah.html', this)">Waktu Terjadinya Malhamah Kubra</div>
+                    <div class="menu-item" onclick="loadPage('bab3_dabiq_amaq.html', this)">Perang Besar di Dabiq / A'maq</div>
+                    <div class="menu-item" onclick="loadPage('bab3_rentang_waktu.html', this)">Rentang Waktu Menuju Konstantinopel</div>
+                    <div class="menu-item" onclick="loadPage('bab3_pasukan_terbaik.html', this)">Pasukan Terbaik dari Madinah</div>
+                    <div class="menu-item" onclick="loadPage('bab3_dialog_muslim_romawi.html', this)">Dialog Muslim & Romawi Pra-Perang</div>
+                    <div class="menu-item" onclick="loadPage('bab3_tiga_golongan.html', this)">Tiga Golongan dalam Perang Besar</div>
+                    <div class="menu-item" onclick="loadPage('bab3_penaklukan_konstantinopel.html', this)">Penaklukan Konstantinopel</div>
+                    <div class="menu-item" onclick="loadPage('bab3_tipu_daya.html', this)">Tipu Daya Setelah Penaklukan</div>
+                    <div class="menu-item" onclick="loadPage('bab3_kembalinya_pasukan.html', this)">Kembalinya Pasukan ke Syam</div>
+                    <div class="menu-item" onclick="loadPage('bab3_kedahsyatan_perang.html', this)">Kedahsyatan Perang Besar</div>
+                    <div class="menu-item" onclick="loadPage('bab3_sisa_pasukan.html', this)">Sisa Pasukan yang Bertahan</div>
+                    <div class="menu-item" onclick="loadPage('bab3_khabar_dajjal.html', this)">Khabar Munculnya Dajjal</div>
+                    <div class="menu-item" onclick="loadPage('bab3_pasukan_pengejar.html', this)">Pasukan Pengejar Dajjal Terbaik</div>
+                </div>
+            </div>
+
+            <!-- PENUTUP (NESTED) -->
+            <div class="menu-section section-penutup">
+                <div class="menu-folder" onclick="toggleSection(this)">Penutup</div>
+                <div class="sub-menu">
+                    <div class="menu-item" onclick="loadPage('daftar_pustaka.html', this)">Daftar Pustaka</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- AREA VIEW KONTEN UTAMA -->
+    <div id="main-content">
+        <div id="cover-view" class="cover-page">
+            <div class="cover-card">
+                <div class="cover-tag">E-Book Studi Hadis Digital</div>
+                <h1 class="cover-title">E-Book: 100 HADIST BUKHARI MUSLIM</h1>
+                <p class="cover-subtitle">Integrasi Nilai Kemanusiaan Islam di Medan Laga dan Rangkaian Kronik Nubuat Masa Depan Dunia</p>
+                <div class="cover-divider"></div>
+                <p class="cover-author">Disusun Oleh: Siti Rohmatuzzakiyyah</p>
+                <p class="cover-meta">Edisi Digital Komprehensif • 2026</p>
+                <button class="start-btn" onclick="startReading()">Mulai Membaca</button>
+            </div>
+        </div>
+        <iframe id="content-frame" style="display: none;"></iframe>
+    </div>
+
+    <!-- SCRIPT UTK NAVIGASI, ACCORDION & RESPONSIVE MOBILE -->
+    <script>
+        const coverView = document.getElementById('cover-view');
+        const contentFrame = document.getElementById('content-frame');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+
+        // Fungsi Buka-Tutup Folder BAB (Nested)
+        function toggleSection(element) {
+            const parent = element.parentElement;
+            const isOpen = parent.classList.contains('open');
+            
+            // Opsional: Tutup bab lain yang sedang terbuka (Solo Accordion mode)
+            // document.querySelectorAll('.menu-section').forEach(sec => sec.classList.remove('open'));
+            
+            if (isOpen) {
+                parent.classList.remove('open');
+            } else {
+                parent.classList.add('open');
+            }
+        }
+
+        // Fungsi Memuat Halaman ke Iframe
+        function loadPage(pageUrl, element) {
+            // Hapus kelas active dari semua item sub-menu
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            
+            // Berikan kelas active pada item yang sedang diklik
+            if(element) {
+                element.classList.add('active');
+            }
+
+            // Atur visualisasi kontainer konten
+            if (pageUrl === 'cover') {
+                contentFrame.style.display = 'none';
+                coverView.style.display = 'flex';
+            } else {
+                coverView.style.display = 'none';
+                contentFrame.style.display = 'block';
+                contentFrame.src = pageUrl;
+            }
+
+            // Jika di device mobile, otomatis tutup sidebar setelah memilih menu
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        }
+
+        // Fungsi Toggle Hamburger Sidebar di Mobile
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+
+        // Trigger Tombol Mulai Membaca
+        function startReading() {
+            const targetBab = document.querySelector('.section-utama');
+            if(!targetBab.classList.contains('open')) {
+                targetBab.classList.add('open');
+            }
+            const sinopsisItem = document.querySelector("[onclick*='sinopsis.html']");
+            if (sinopsisItem) sinopsisItem.click();
+        }
+    </script>
+</body>
+</html>
